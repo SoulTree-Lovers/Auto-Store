@@ -1,4 +1,4 @@
-package com.example.autobuyer.dto;
+package org.example.business.dto;
 
 public class AliExpressDto {
 }
