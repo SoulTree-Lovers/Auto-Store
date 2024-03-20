@@ -1,1 +1,3 @@
-rootProject.name = 'auto-buyer'
+rootProject.name = 'auto-store'
+include 'api'
+include 'business'
