@@ -1,4 +1,4 @@
-package org.example.api.domain.storeadmin.controller;
+package org.example.api.webflux.domain.storeadmin.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

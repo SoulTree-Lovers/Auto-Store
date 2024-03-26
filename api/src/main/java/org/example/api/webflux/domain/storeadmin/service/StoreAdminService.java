@@ -1,4 +1,4 @@
-package org.example.api.domain.storeadmin.service;
+package org.example.api.webflux.domain.storeadmin.service;
 
 import org.springframework.stereotype.Service;
 

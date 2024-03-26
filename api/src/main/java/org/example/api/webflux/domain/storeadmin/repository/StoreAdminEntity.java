@@ -1,4 +1,4 @@
-package org.example.api.domain.storeadmin.repository;
+package org.example.api.webflux.domain.storeadmin.repository;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

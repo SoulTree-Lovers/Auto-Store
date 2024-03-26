@@ -1,4 +1,4 @@
-package org.example.api.domain.storeadmin.controller.model;
+package org.example.api.webflux.domain.storeadmin.controller.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
