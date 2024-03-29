@@ -1,4 +1,4 @@
-package org.example.api.mvc.domain.storeadmin.controller.model;
+package org.example.api.mvc.domain.product.controller.model;
 
 
 import lombok.AllArgsConstructor;
@@ -10,10 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StoreAdminRequest {
+public class ProductRequestMvc {
 
-    /**
-     * TODO: StoreAdmin 요청 DTO
-     */
 
 }

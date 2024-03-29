@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "product")
-public class ProductEntity {
+public class ProductEntityWebFlux {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

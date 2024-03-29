@@ -1,5 +1,4 @@
-package org.example.api.mvc.domain.product.controller.model;
-
+package org.example.api.webflux.domain.storeadmin.controller.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductRequest {
+public class StoreAdminResponseWebFlux {
 
-
+    /**
+     * TODO: StoreAdmin 응답 DTO
+     */
 }
