@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: api
+
+  r2dbc:
+    url: auto-store:mysql://localhost:3320/autostore
+    username: root
+    password: root
