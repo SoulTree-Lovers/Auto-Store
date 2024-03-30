@@ -1,8 +1,20 @@
+#logging:
+#  level:
+#    root: info
+
 spring:
   application:
     name: api
 
   r2dbc:
-    url: auto-store:mysql://localhost:3320/autostore
+    url: r2dbc:mysql://localhost:3320/autostore
     username: root
     password: root
+
+  jpa:
+    show-sql: true # sql 쿼리문을 콘솔에 보여주기 위함.
+    properties:
+      format_sql: true
+      dialect: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: validate # 서버를 띄울 때 클래스 엔티티와 디비의 속성이 일치하는 지 확인 (create, update 등 여러 속성이 있음 --> validate 추천!)
