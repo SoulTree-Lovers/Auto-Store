@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 @Builder
 public class ProductResponseWebFlux {
 
+    private Long id; // 상품 아이디
+
     private Long adminId; // 판매자 아이디
 
     private String name; // 상품 이름
@@ -30,6 +32,7 @@ public class ProductResponseWebFlux {
 
     public static ProductResponseWebFlux of(ProductEntityWebFlux productEntityWebFlux) {
         return ProductResponseWebFlux.builder()
+            .id(productEntityWebFlux.getId())
             .adminId(productEntityWebFlux.getAdminId())
             .name(productEntityWebFlux.getName())
             .price(productEntityWebFlux.getPrice())
