@@ -23,8 +23,8 @@ public class ProductRequestMvc {
 
     private String thumbnailUrl; // 상품 썸네일 이미지 주소
 
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
+//    private LocalDateTime createdAt;
+//
+//    private LocalDateTime updatedAt;
 
 }
