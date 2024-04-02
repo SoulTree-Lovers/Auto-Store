@@ -1,8 +1,14 @@
-#logging:
-#  level:
-#    root: info
+logging:
+  level:
+    root: info
 
 spring:
+  boot:
+    admin:
+      client:
+        url:
+          - http://localhost:8080 # 서버 주소
+
   application:
     name: api
 
@@ -20,7 +26,7 @@ spring:
       ddl-auto: validate # 서버를 띄울 때 클래스 엔티티와 디비의 속성이 일치하는 지 확인 (create, update 등 여러 속성이 있음 --> validate 추천!)
 
   datasource:
-    url: jdbc:mysql://localhost:3320/autostore?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true # mysql 서버 연동
+    url: jdbc:mysql://localhost:3320/autostore # mysql 서버 연동 ?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: root # db 비밀번호
