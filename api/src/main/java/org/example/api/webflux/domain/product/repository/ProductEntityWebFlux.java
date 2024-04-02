@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 public class ProductEntityWebFlux {
 
     @Id
+    @org.springframework.data.annotation.Id
     @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
