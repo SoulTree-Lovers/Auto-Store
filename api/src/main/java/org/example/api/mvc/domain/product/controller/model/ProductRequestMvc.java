@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-//@AllArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProductRequestMvc {
 
     private Long adminId; // 판매자 아이디
