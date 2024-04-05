@@ -56,7 +56,22 @@ public class ProductControllerMvc {
     }
 
     // Update
+    @PutMapping("/update/{id}")
+    public ProductResponseMvc updateProductById(
+        @PathVariable Long id,
+        @RequestBody ProductRequestMvc productRequestMvc
+    ) {
+        var productEntity = productServiceMvc.update(
+            id,
+            productRequestMvc.getAdminId(),
+            productRequestMvc.getName(),
+            productRequestMvc.getPrice(),
+            productRequestMvc.getCategory(),
+            productRequestMvc.getThumbnailUrl()
+        );
 
+        return productConverter.toResponse(productEntity);
+    }
 
     // Delete
     @DeleteMapping("/delete/{id}")
