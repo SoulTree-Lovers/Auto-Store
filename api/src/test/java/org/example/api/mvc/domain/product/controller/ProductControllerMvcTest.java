@@ -211,12 +211,50 @@ class ProductControllerMvcTest {
     @Test
     void deleteProduct() {
         // given
+        // 상품 저장을 위한 데이터
+        Long adminId1 = 1L;
+        String name1 = "상품1";
+        Long price1 = 10000L;
+        String category1 = "전자기기";
+        String thumbnailUrl1 = "https://naver.com?213asdabfd";
 
+        Long adminId2 = 2L;
+        String name2 = "상품2";
+        Long price2 = 15000L;
+        String category2 = "생활용품";
+        String thumbnailUrl2 = "https://naver.com?213asdaa";
+
+        ProductEntityMvc entity1 = ProductEntityMvc.builder()
+            .adminId(adminId1)
+            .name(name1)
+            .price(price1)
+            .category(category1)
+            .thumbnailUrl(thumbnailUrl1)
+            .build();
+
+        ProductEntityMvc entity2 = ProductEntityMvc.builder()
+            .adminId(adminId2)
+            .name(name2)
+            .price(price2)
+            .category(category2)
+            .thumbnailUrl(thumbnailUrl2)
+            .build();
+
+        // 상품 2개 저장
+        productRepositoryMvc.save(entity1);
+        productRepositoryMvc.save(entity2);
+
+        ProductEntityMvc savedEntity = productRepositoryMvc.save(entity1);
+        Long id = savedEntity.getId(); // id를 통해 찾기 위해 가져옴.
+
+        String url = "http://localhost:" + port + "/mvc/product/delete/" + id;
 
         // when
-
+        testRestTemplate.delete(url); // entity 하나 삭제
 
         // then
+        // 2개 중 1개를 삭제하였으므로 남은 개수가 1개인지 확인
+        assertThat(productRepositoryMvc.findAll().size()).isEqualTo(1);
 
 
     }
