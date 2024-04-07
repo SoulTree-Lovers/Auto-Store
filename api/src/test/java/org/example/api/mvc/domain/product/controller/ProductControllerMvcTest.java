@@ -170,13 +170,41 @@ class ProductControllerMvcTest {
     @Test
     void findProductById() {
         // given
+        // 상품 저장을 위한 데이터
+        Long adminId1 = 1L;
+        String name1 = "상품1";
+        Long price1 = 10000L;
+        String category1 = "전자기기";
+        String thumbnailUrl1 = "https://naver.com?213asdabfd";
 
+
+        ProductEntityMvc entity1 = ProductEntityMvc.builder()
+            .adminId(adminId1)
+            .name(name1)
+            .price(price1)
+            .category(category1)
+            .thumbnailUrl(thumbnailUrl1)
+            .build();
+
+        // 상품 1개 저장 후 id 가져오기
+        ProductEntityMvc savedEntity = productRepositoryMvc.save(entity1);
+        Long id = savedEntity.getId(); // id를 통해 찾기 위해 가져옴.
+
+        String url = "http://localhost:" + port + "/mvc/product/find/" + id;
 
         // when
-
+        ResponseEntity<ProductResponseMvc> responseEntity = testRestTemplate.getForEntity(url, ProductResponseMvc.class);
 
         // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
+        ProductResponseMvc product = responseEntity.getBody();
+
+        assertThat(product.getAdminId()).isEqualTo(adminId1);
+        assertThat(product.getName()).isEqualTo(name1);
+        assertThat(product.getPrice()).isEqualTo(price1);
+        assertThat(product.getCategory()).isEqualTo(category1);
+        assertThat(product.getThumbnailUrl()).isEqualTo(thumbnailUrl1);
 
     }
 
