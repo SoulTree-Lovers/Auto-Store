@@ -5,6 +5,7 @@ import org.example.api.mvc.domain.product.repository.ProductEntityMvc;
 import org.example.api.mvc.domain.product.repository.ProductRepositoryMvc;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +50,26 @@ public class ProductServiceMvc {
     }
 
     // Update
+    public ProductEntityMvc update(
+        Long id,
+        Long adminId,
+        String name,
+        Long price,
+        String category,
+        String thumbnailUrl
+    ) {
+        ProductEntityMvc product = productRepositoryMvc.findById(id).orElseThrow(() -> {
+            return new IllegalArgumentException("해당 상품이 존재하지 않습니다.");
+        });
 
+        product.setAdminId(adminId);
+        product.setName(name);
+        product.setPrice(price);
+        product.setCategory(category);
+        product.setThumbnailUrl(thumbnailUrl);
+
+        return productRepositoryMvc.save(product);
+    }
 
     // Delete
     public void deleteById(Long id) {
