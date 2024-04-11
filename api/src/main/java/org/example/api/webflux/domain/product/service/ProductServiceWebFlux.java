@@ -1,6 +1,7 @@
 package org.example.api.webflux.domain.product.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.api.mvc.domain.product.repository.ProductEntityMvc;
 import org.example.api.webflux.domain.product.repository.ProductEntityWebFlux;
 import org.example.api.webflux.domain.product.repository.ProductRepositoryWebFlux;
 import org.springframework.stereotype.Service;
@@ -42,9 +43,30 @@ public class ProductServiceWebFlux {
         return productRepositoryWebFlux.findAll();
     }
 
-    // Update
     public Mono<ProductEntityWebFlux> findById(Long id) {
         return productRepositoryWebFlux.findById(id);
+    }
+
+    // Update
+    public Mono<ProductEntityWebFlux> update(
+        Long id,
+        Long adminId,
+        String name,
+        Long price,
+        String category,
+        String thumbnailUrl
+    ) {
+
+        return productRepositoryWebFlux.findById(id)
+                .flatMap(product -> {
+                    product.setAdminId(adminId);
+                    product.setName(name);
+                    product.setPrice(price);
+                    product.setCategory(category);
+                    product.setThumbnailUrl(thumbnailUrl);
+
+                    return productRepositoryWebFlux.save(product);
+                });
     }
 
     // Delete
