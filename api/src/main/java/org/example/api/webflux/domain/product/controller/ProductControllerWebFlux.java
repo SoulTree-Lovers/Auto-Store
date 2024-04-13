@@ -53,7 +53,23 @@ public class ProductControllerWebFlux {
     }
 
     // Update
+    @PutMapping("/update/{id}")
+    public Mono<ResponseEntity<ProductResponseWebFlux>> updateProduct(
+        @PathVariable Long id,
+        @RequestBody ProductRequestWebFlux productRequestWebFlux
+    ) {
 
+        return productServiceWebFlux.update(
+                id,
+                productRequestWebFlux.getAdminId(),
+                productRequestWebFlux.getName(),
+                productRequestWebFlux.getPrice(),
+                productRequestWebFlux.getCategory(),
+                productRequestWebFlux.getThumbnailUrl()
+            )
+            .map(product -> ResponseEntity.ok(ProductResponseWebFlux.of(product)))
+            .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+    }
 
     // Delete
     @DeleteMapping("/delete/{id}")
