@@ -1,6 +1,7 @@
 package org.example.api.webflux.domain.product.controller.model;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-//@AllArgsConstructor
+@AllArgsConstructor
 public class ProductRequestWebFlux {
 
     private Long adminId; // 판매자 아이디
@@ -21,8 +22,8 @@ public class ProductRequestWebFlux {
 
     private String thumbnailUrl; // 상품 썸네일 이미지 주소
 
-    private LocalDateTime createdAt;
+//    private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
+//    private LocalDateTime updatedAt;
 
 }
