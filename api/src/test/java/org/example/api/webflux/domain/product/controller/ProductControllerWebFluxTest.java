@@ -148,5 +148,12 @@ class ProductControllerWebFluxTest {
 
     @Test
     void deleteProduct() {
+        when(productServiceWebFlux.deleteById(1L)).thenReturn(
+            Mono.empty()
+        );
+
+        webTestClient.delete().uri("/web-flux/product/delete/1")
+            .exchange()
+            .expectStatus().is2xxSuccessful();
     }
 }
