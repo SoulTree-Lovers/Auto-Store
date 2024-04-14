@@ -31,14 +31,8 @@ class ProductControllerWebFluxTest {
     @Autowired
     private WebTestClient webTestClient;
 
-//    @Autowired
-//    ProductServiceWebFlux productServiceWebFlux;
-
     @MockBean
     private ProductServiceWebFlux productServiceWebFlux;
-
-//    @Autowired
-//    ProductRepositoryWebFlux productRepositoryWebFlux;
 
 //    @BeforeEach
 //    void setUp() {
@@ -99,6 +93,24 @@ class ProductControllerWebFluxTest {
 
     @Test
     void findProductById() {
+        // given
+        // when
+        when(productServiceWebFlux.findById(1L)).thenReturn(
+            Mono.just(new ProductEntityWebFlux(1L, 1L, "상품1", 10000L, "전자기기", "https://naver.com?213asdabfd", LocalDateTime.now(), LocalDateTime.now()))
+        );
+
+        // then
+        webTestClient.get().uri("/web-flux/product/find/1")
+            .exchange()
+            .expectStatus().is2xxSuccessful()
+            .expectBody(ProductResponseWebFlux.class)
+            .value( res -> {
+                assertEquals(1L, res.getAdminId());
+                assertEquals("상품1", res.getName());
+                assertEquals(10000L, res.getPrice());
+                assertEquals("전자기기", res.getCategory());
+                assertEquals("https://naver.com?213asdabfd", res.getThumbnailUrl());
+            });
     }
 
     @Test
