@@ -127,6 +127,23 @@ class ProductControllerWebFluxTest {
 
     @Test
     void updateProduct() {
+        when(productServiceWebFlux.update(1L, 1L, "상품1", 10000L, "전자기기", "https://naver.com?213asdabfd")).thenReturn(
+            Mono.just(new ProductEntityWebFlux(1L, 1L, "상품1", 10000L, "전자기기", "https://naver.com?213asdabfd", LocalDateTime.now(), LocalDateTime.now()))
+        );
+
+        webTestClient.put().uri("/web-flux/product/update/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new ProductRequestWebFlux(1L, "상품1", 10000L, "전자기기", "https://naver.com?213asdabfd"))
+            .exchange()
+            .expectStatus().is2xxSuccessful()
+            .expectBody(ProductResponseWebFlux.class)
+            .value(res -> {
+                assertEquals(1L, res.getAdminId());
+                assertEquals("상품1", res.getName());
+                assertEquals(10000L, res.getPrice());
+                assertEquals("전자기기", res.getCategory());
+                assertEquals("https://naver.com?213asdabfd", res.getThumbnailUrl());
+            });
     }
 
     @Test
