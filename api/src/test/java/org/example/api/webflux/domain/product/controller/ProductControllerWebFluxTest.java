@@ -114,6 +114,18 @@ class ProductControllerWebFluxTest {
     }
 
     @Test
+    void notFoundUser() {
+
+        when(productServiceWebFlux.findById(1L)).thenReturn(
+            Mono.empty()
+        );
+
+        webTestClient.get().uri("/web-flux/product/find/1")
+            .exchange()
+            .expectStatus().is4xxClientError();
+    }
+
+    @Test
     void updateProduct() {
     }
 
