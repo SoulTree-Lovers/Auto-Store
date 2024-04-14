@@ -31,16 +31,4 @@ public class ProductResponseMvc {
 
     private LocalDateTime updatedAt;
 
-    public static ProductResponseMvc of(ProductResponseMvc productResponseMvc) {
-        return ProductResponseMvc.builder()
-            .id(productResponseMvc.getId())
-            .adminId(productResponseMvc.getAdminId())
-            .name(productResponseMvc.getName())
-            .price(productResponseMvc.getPrice())
-            .category(productResponseMvc.getCategory())
-            .thumbnailUrl(productResponseMvc.getThumbnailUrl())
-            .createdAt(productResponseMvc.getCreatedAt())
-            .updatedAt(productResponseMvc.getUpdatedAt())
-            .build();
-    }
 }
