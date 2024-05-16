@@ -36,8 +36,8 @@ dependencies {
 	implementation files('libs/gop-sdk-Java1701065323525.jar')
 	implementation files('libs/gop-sdk-Java1701065323525-source.jar')
 	implementation group: 'com.squareup.okhttp', name: 'okhttp', version: '2.7.5'
-//	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-//	runtimeOnly 'mysql:mysql-connector-java'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'com.google.code.gson:gson:2.8.8'
 }
 
 tasks.named('test') {

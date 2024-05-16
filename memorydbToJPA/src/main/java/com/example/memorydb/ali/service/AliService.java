@@ -56,13 +56,11 @@ public class AliService {
     public List<ProductEntityFromAli> loadAllProducts() throws Exception {
         List<String> categoryIds = Arrays.asList(
                 "200001085",
-                "200293142",
                 "200001726",
                 "36",
                 "200002005",
                 "200003411",
                 "200003427",
-                "201159809",
                 "1504"
         );
         List<ProductEntityFromAli> allProducts = new ArrayList<>();
