@@ -1,3 +1,4 @@
 rootProject.name = 'auto-store'
 include 'api'
 include 'business'
+include 'memorydbToJPA'
