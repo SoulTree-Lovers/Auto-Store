@@ -12,9 +12,13 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class AliService {
@@ -80,6 +84,24 @@ public class AliService {
 
     // 카테고리별 상품 로드
     public List<ProductEntityFromAli> loadProduct(String categoryId) throws Exception {
+        String NaverCategoryId = null;
+        switch (categoryId) {
+            case "200001085" -> {NaverCategoryId="50002936";
+            }
+            case "200001726" -> {NaverCategoryId="50004643";
+            }
+            case "36" -> {NaverCategoryId="50006910";
+            }
+            case "200002005" -> {NaverCategoryId="50003915";
+            }
+            case "200003411" -> {NaverCategoryId="50004086";
+            }
+            case "200003427" -> {NaverCategoryId="50004057";
+            }
+            case "1504" -> {NaverCategoryId="50007247";
+            }
+        }
+
         IopClient client = new IopClientImpl(url, appkey, appSecret);
         IopRequest request = new IopRequest();
         request.setApiName("aliexpress.affiliate.product.query");
@@ -139,13 +161,20 @@ public class AliService {
             String evaluateRate = (String) tmp.get("evaluate_rate");
             String productTitle = (String) tmp.get("product_title");
 
-            ProductEntityFromAli productEntityObj = new ProductEntityFromAli(lastReadId++, productTitle, appSalePrice, originalPrice, targetSalePrice, productDetailUrl, url0, url1, url2, url3, url4, url5, productMainImageUrl, productVideoUrl, evaluateRate, lastestVolume, discount, shopUrl, firstLevelCategoryName, secondLevelCategoryName, promotionLink);
+            ProductEntityFromAli productEntityObj = new ProductEntityFromAli(lastReadId++, productTitle, appSalePrice, originalPrice, targetSalePrice, productDetailUrl, url0, url1, url2, url3, url4, url5, productMainImageUrl, productVideoUrl, evaluateRate, lastestVolume, discount, shopUrl, NaverCategoryId, firstLevelCategoryName, secondLevelCategoryName, promotionLink);
             aliExpressRepository.save(productEntityObj);
             savedProducts.add(productEntityObj);
         }
         return savedProducts;
     }
 
+    // 오늘 생성된 상품들을 가져오는 메소드 추가
+    public List<ProductEntityFromAli> getTodayProducts() {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+        return aliExpressRepository.findByCreatedAtBetween(startOfDay, endOfDay);
+    }
 
     public void deleteAllProducts() {
         aliExpressRepository.deleteAll();

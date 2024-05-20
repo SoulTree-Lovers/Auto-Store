@@ -77,6 +77,9 @@ public class ProductEntityFromAli {
     @Column(name = "shop_url", columnDefinition = "TEXT")
     private String shopUrl;
 
+    @Column(name = "category_id")
+    private String categoryID;
+
     @Column(name = "first_level_category_name")
     private String firstLevelCategoryName;
 
@@ -94,7 +97,7 @@ public class ProductEntityFromAli {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public ProductEntityFromAli(Long id, String productTitle, String appSalePrice, String originalPrice, String targetSalePrice, String productDetailUrl, String url0, String url1, String url2, String url3, String url4, String url5, String productMainImageUrl, String productVideoUrl, String evaluateRate, Integer lastestVolume, String discount, String shopUrl, String firstLevelCategoryName, String secondLevelCategoryName, String promotionLink) {
+    public ProductEntityFromAli(Long id, String productTitle, String appSalePrice, String originalPrice, String targetSalePrice, String productDetailUrl, String url0, String url1, String url2, String url3, String url4, String url5, String productMainImageUrl, String productVideoUrl, String evaluateRate, Integer lastestVolume, String discount, String shopUrl, String categoryID,String firstLevelCategoryName, String secondLevelCategoryName, String promotionLink) {
         this.id = id;
         this.productTitle = productTitle;
         this.appSalePrice = appSalePrice;
@@ -113,6 +116,7 @@ public class ProductEntityFromAli {
         this.lastestVolume = lastestVolume;
         this.discount = discount;
         this.shopUrl = shopUrl;
+        this.categoryID = categoryID;
         this.firstLevelCategoryName = firstLevelCategoryName;
         this.secondLevelCategoryName = secondLevelCategoryName;
         this.promotionLink = promotionLink;
