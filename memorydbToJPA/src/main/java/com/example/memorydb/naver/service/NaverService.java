@@ -1,7 +1,10 @@
 package com.example.memorydb.naver.service;
 
 import com.example.memorydb.ali.db.entity.ProductEntityFromAli;
+import com.example.memorydb.ali.db.repository.AliExpressRepository;
 import com.example.memorydb.ali.service.AliService;
+import com.example.memorydb.naver.db.entity.NaverEntity;
+import com.example.memorydb.naver.db.repository.NaverRepository;
 import com.global.iop.util.StringUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -23,8 +26,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Base64;
@@ -35,8 +37,17 @@ import java.util.concurrent.TimeUnit;
 public class NaverService {
     @Autowired
     private OkHttpClient okHttpClient;
-
+    @Autowired
+    private NaverRepository naverRepository;
     private final AliService aliService;
+
+    public NaverEntity saveOriginProductNo(String originProductNo) {
+        NaverEntity naverEntity = NaverEntity.builder()
+                .originProductNo(originProductNo)
+                .build();
+        return naverRepository.save(naverEntity);
+    }
+
     private String clientId = "7IhZZgD9MgJg9wvwvHTpIc";
     private String clientSecret = "$2a$04$QD6jfkmbqnEc/kQrayyU1.";
 
@@ -49,7 +60,8 @@ public class NaverService {
         OkHttpClient client = new OkHttpClient();
         String accessToken = getToken();
 
-        List<ProductEntityFromAli> todayProducts = aliService.getTodayProducts(); // 오늘 생성된 상품들 가져오기
+        List<ProductEntityFromAli> todayProducts = aliService.getRecentProducts(); // 최근 생성된 상품들(10분 이내) 가져오기
+        System.out.println(todayProducts);
         for (ProductEntityFromAli product : todayProducts) {
             ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(1).withMinute(0).withSecond(0).withNano(0);
             ZonedDateTime endDateTime = now.plusYears(1).withMinute(59).withSecond(0).withNano(0);
@@ -75,6 +87,7 @@ public class NaverService {
 
             JsonObject representativeImage = new JsonObject();
             String NaverURL = registerWithDelay(product.getProductMainImageUrl());
+            if (NaverURL == null) continue; // Main 이미지 등록 실패 시 스킵
             representativeImage.addProperty("url", NaverURL);
             JsonObject images = new JsonObject();
             images.add("representativeImage", representativeImage);
@@ -189,18 +202,64 @@ public class NaverService {
                     .addHeader("Authorization", accessToken)
                     .addHeader("content-type", "application/json")
                     .build();
-
+            Response response = null;
             try {
-                Response response = client.newCall(request).execute();
+                response = client.newCall(request).execute();
                 if (response.isSuccessful()) {
                     System.out.println("Product registered successfully");
+
+                    String responseBody = response.body().string();
+                    System.out.println("Response body: " + responseBody);
+
+                    JsonObject jsonResponse = JsonParser.parseString(responseBody).getAsJsonObject();
+                    String smartstoreChannelProductNo = jsonResponse.get("smartstoreChannelProductNo").getAsString();
+                    System.out.println("Parsed Smartstore Channel Product Number: " + smartstoreChannelProductNo);
+
+                    // DB에 smartstoreChannelProductNo 저장
+                    saveOriginProductNo(smartstoreChannelProductNo);
+                    System.out.println("Smartstore Channel Product Number saved to database");
                 } else {
                     System.out.println("Failed to register product. Response code: " + response.code());
                     System.out.println("Response body: " + response.body().string());
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
+        }
+    }
+
+    public List<NaverEntity> getRegisteredProducts() {
+        return naverRepository.findAll();
+    }
+
+    public void deleteProduct() throws IOException, InterruptedException {
+        OkHttpClient client = new OkHttpClient();
+        String accessToken = getToken();
+        List<NaverEntity> registerProducts = getRegisteredProducts(); // 오늘 생성된 상품들 가져오기
+        System.out.println(registerProducts);
+        for (NaverEntity registerProduct : registerProducts) {
+            String channelProductNo = registerProduct.getOriginProductNo();
+            String url = "https://api.commerce.naver.com/external/v2/products/channel-products/" + channelProductNo;
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .delete(RequestBody.create(null, new byte[0]))
+                    .addHeader("Authorization", "Bearer " + accessToken)
+                    .build();
+
+            Response response = client.newCall(request).execute();
+            if (response.isSuccessful()) {
+                System.out.println("Product deleted successfully");
+            } else {
+                System.out.println("Failed to delete product. Response code: " + response.code());
+                System.out.println("Response body: " + response.body().string());
+            }
+            Thread.sleep(1000);
         }
     }
 
@@ -253,10 +312,22 @@ public class NaverService {
     }
 
     private void addOptionalImageWithDelay(JsonArray optionalImages, String imageUrl) throws IOException, ParseException {
-        if (imageUrl != null && !imageUrl.isEmpty()) {
-            String url = registerWithDelay(imageUrl);
-            optionalImages.add(createImageObject(url));
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            return; // URL이 null이거나 비어있으면 스킵
         }
+
+        try {
+            String uploadedUrl = registerWithDelay(imageUrl);
+            if (uploadedUrl != null) {
+                optionalImages.add(createImageObject(uploadedUrl));
+            }
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+            // 오류 발생 시 해당 URL 스킵
+        }
+    }
+    public void deleteAllProducts() {
+        naverRepository.deleteAll();
     }
 
     private String generateSignature(String clientId, String clientSecret, Long timestamp) {
@@ -321,6 +392,9 @@ public class NaverService {
             fileBody = RequestBody.create(MediaType.parse("image/gif"), imageFile);
         } else if(extension.equals("bmp")){
             fileBody = RequestBody.create(MediaType.parse("image/bmp"), imageFile);
+        } else {
+            System.err.println("지원되지 않는 이미지 형식: " + extension);
+            return null; // 지원되지 않는 이미지 형식일 경우 null 반환
         }
 
         //RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpeg"), imageFile);
@@ -339,7 +413,9 @@ public class NaverService {
 
         Response response = client.newCall(request).execute();
         if (!response.isSuccessful()) {
-            throw new IOException("이미지 업로드 실패: " + response);
+            System.err.println("이미지 업로드 실패: " + response);
+            response.close(); // response body를 사용 후 즉시 닫기
+            return null; // 실패 시 null 반환
         }
         String rst = response.body().string();
 

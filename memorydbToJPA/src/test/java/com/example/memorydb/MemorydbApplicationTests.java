@@ -1,5 +1,11 @@
 package com.example.memorydb;
 
+import com.example.memorydb.ali.db.repository.AliExpressRepository;
+import com.global.iop.api.IopClient;
+import com.global.iop.api.IopClientImpl;
+import com.global.iop.api.IopRequest;
+import com.global.iop.api.IopResponse;
+import com.global.iop.util.ApiException;
 import com.global.iop.util.StringUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -17,6 +23,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import com.global.iop.domain.Protocol;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -31,9 +38,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collections;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootTest
@@ -67,7 +72,7 @@ class MemorydbApplicationTests {
 		originProduct.addProperty("detailContent", "아이패드 프로 12.9 매트 필름");
 
 		JsonObject representativeImage = new JsonObject();
-		String NaverURL = register("https://ae01.alicdn.com/kf/Sde5640813b6b4750ae6e144770264d9aU.jpg");
+		String NaverURL = register("https://ae01.alicdn.com/kf/S2287e804968345e598a1841b7925e88ck.jpg");
 		representativeImage.addProperty("url", NaverURL);
 		JsonObject images = new JsonObject();
 		images.add("representativeImage", representativeImage);
@@ -75,20 +80,20 @@ class MemorydbApplicationTests {
 		// Optional images array
 		String url;
 		JsonArray optionalImages = new JsonArray();
-		url = register("https://ae01.alicdn.com/kf/Sde5640813b6b4750ae6e144770264d9aU.jpg");
+//		url = register("https://ae01.alicdn.com/kf/S5bf2128a738f480094ee562e2fbe32b7s.jpg");
+//		optionalImages.add(createImageObject(url));
+
+		url = register("https://ae01.alicdn.com/kf/S48a1ac7ac0d94f65a701fb6aeba01cc13.jpg");
 		optionalImages.add(createImageObject(url));
 
-		url = register("https://ae01.alicdn.com/kf/Sae4d94b2a9a1414d847c00778ec9d397L.jpg");
+		url = register("https://ae01.alicdn.com/kf/Sf4dcc926da0d4ee684cfb93525ad317ct.jpg");
 		optionalImages.add(createImageObject(url));
 
-		url = register("https://ae01.alicdn.com/kf/S6f58a14497c4415080f45aa75315efe04.jpg");
+		url = register("https://ae01.alicdn.com/kf/Sbb9251ecf7e5466986b25ca0bdc6a694J.jpg");
 		optionalImages.add(createImageObject(url));
 
-		url = register("https://ae01.alicdn.com/kf/S2477f3425bdc4da2828853fd4a0b86462.jpg");
-		optionalImages.add(createImageObject(url));
-
-		url = register("https://ae01.alicdn.com/kf/S72c06c9b5631484abb022c727d46b6c3s.jpg");
-		optionalImages.add(createImageObject(url));
+//		url = register("https://ae01.alicdn.com/kf/Sfe9beac5b4194f6cae37151ae1deb4f3f.jpg");
+//		optionalImages.add(createImageObject(url));
 
 //		url = register("https://ae01.alicdn.com/kf/Sf26f2b756b94499ca48125d7c073b0c4O.jpg");
 //		optionalImages.add(createImageObject(url));
@@ -203,6 +208,14 @@ class MemorydbApplicationTests {
 			Response response = client.newCall(request).execute();
 			if (response.isSuccessful()) {
 				System.out.println("Product registered successfully");
+
+				// 응답 본문 파싱
+				String responseBody = response.body().string();
+				System.out.println(responseBody);
+				JsonObject jsonResponse = JsonParser.parseString(responseBody).getAsJsonObject();
+				int smartstoreChannelProductNo = jsonResponse.get("smartstoreChannelProductNo").getAsInt();
+
+				System.out.println("Smartstore Channel Product Number: "+smartstoreChannelProductNo);
 			} else {
 				System.out.println("Failed to register product. Response code: " + response.code());
 				System.out.println("Response body: " + response.body().string());
@@ -278,6 +291,29 @@ class MemorydbApplicationTests {
 		return image;
 	}
 
+	@Test
+	void deleteProduct() throws IOException {
+		OkHttpClient client = new OkHttpClient();
+		String accessToken = getToken();
+		String channelProductNo = "10349697956";
+		String url = "https://api.commerce.naver.com/external/v2/products/channel-products/" + channelProductNo;
+
+		Request request = new Request.Builder()
+				.url(url)
+				.delete(RequestBody.create(null, new byte[0]))
+				.addHeader("Authorization", "Bearer " + accessToken)
+				.build();
+
+		Response response = client.newCall(request).execute();
+		if (response.isSuccessful()) {
+			System.out.println("Product deleted successfully");
+		} else {
+			System.out.println("Failed to delete product. Response code: " + response.code());
+			System.out.println("Response body: " + response.body().string());
+		}
+	}
+
+
 
 	@Test
 	void mathTest(){
@@ -318,6 +354,25 @@ class MemorydbApplicationTests {
 		String responseBody = response.body().string(); // 응답 본문을 문자열로 변환
 		System.out.println(responseBody); // 카테고리 목록 출력
 	}
+
+	String url = "https://api-sg.aliexpress.com/";
+	String SIGN_METHOD = "sha256";
+	String appkey = "505450";
+	String appSecret = "wvnyRtRuvXPKThi4bsX5SzzXwxK2sAOs";
+	String CODE = "3_505450_Z5v32pqtE4jTtfDBxeZq0nAn6351";
+	String TOKEN = "50000200c10umQ9mwoQecd18ee0528IzClSfuvHADAw8L0uDnfPkXFtWCHwvNBNLGAZs";
+	String appSignature="keib";
+	String trackingId="keib";
+	private IopClient iopClient;
+	@Test
+	void AliCategory() throws IOException, ApiException {
+		IopClient client = new IopClientImpl(url, appkey, appSecret);
+		IopRequest request = new IopRequest();
+		request.setApiName("aliexpress.affiliate.category.get");
+		request.addApiParameter("app_signature", TOKEN);
+		IopResponse response = client.execute(request, Protocol.GOP);
+		System.out.println(response.getGopResponseBody());
+	} // Ali 카테고리
 
 
 	private String generateSignature(String clientId, String clientSecret, Long timestamp) {

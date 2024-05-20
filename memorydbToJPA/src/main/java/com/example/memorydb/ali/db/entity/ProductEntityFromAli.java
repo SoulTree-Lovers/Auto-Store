@@ -122,8 +122,4 @@ public class ProductEntityFromAli {
         this.promotionLink = promotionLink;
     }
 
-
-    /**
-     * TODO: 이름, 별점, 가격 등에 대한 정보 속성 추가하기.
-     */
 }
