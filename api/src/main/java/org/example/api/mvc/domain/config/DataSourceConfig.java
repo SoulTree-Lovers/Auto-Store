@@ -15,10 +15,11 @@ public class DataSourceConfig {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-//        dataSource.setUrl("jdbc:mysql://localhost:3320/autostore");
-        dataSource.setUrl("jdbc:mysql://autostore.cle2yiiugd0z.ap-southeast-2.rds.amazonaws.com:3306/autostoreDB?serverTimezone=Asia/Seoul&characterEncoding=UTF-8");
+        dataSource.setUrl("jdbc:mysql://localhost:3320/autostore");
+//        dataSource.setUrl("jdbc:mysql://autostore.cle2yiiugd0z.ap-southeast-2.rds.amazonaws.com:3306/autostoreDB?serverTimezone=Asia/Seoul&characterEncoding=UTF-8");
         dataSource.setUsername("root");
-        dataSource.setPassword("root1234!!");
+        dataSource.setPassword("root");
+//        dataSource.setPassword("root1234!!");
         return dataSource;
 //        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
 //        return builder.setType(EmbeddedDatabaseType.HSQL).build();
