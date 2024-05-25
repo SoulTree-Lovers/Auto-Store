@@ -143,6 +143,9 @@ public class AliService {
             String appSalePrice = (String) tmp.get("app_sale_price");
             String originalPrice = (String) tmp.get("original_price");
             String targetSalePrice = (String) tmp.get("target_sale_price");
+            String evaluateRate = (String) tmp.get("evaluate_rate");
+            double rate = Double.parseDouble(evaluateRate.replace("%", ""));
+            if (rate<90) continue;  //평점이 90% 이하라면 저장 안함
             String productMainImageUrl = (String) tmp.get("product_main_image_url");
             registeredImageUrls.add(productMainImageUrl);
             String productDetailUrl = (String) tmp.get("product_detail_url");
@@ -172,7 +175,6 @@ public class AliService {
             String productVideoUrl = (String) tmp.get("product_video_url");
             String firstLevelCategoryName = (String) tmp.get("first_level_category_name");
             String promotionLink = (String) tmp.get("promotion_link");
-            String evaluateRate = (String) tmp.get("evaluate_rate");
             String productTitle = (String) tmp.get("product_title");
 
             ProductEntityFromAli productEntityObj = new ProductEntityFromAli(lastReadId++, productTitle, appSalePrice, originalPrice, targetSalePrice, productDetailUrl, url0, url1, url2, url3, url4, url5, productMainImageUrl, productVideoUrl, evaluateRate, lastestVolume, discount, shopUrl, NaverCategoryId, firstLevelCategoryName, secondLevelCategoryName, promotionLink);
@@ -184,8 +186,7 @@ public class AliService {
     }
 
     // 오늘 생성된 상품들을 가져오는 메소드 추가
-    public List<ProductEntityFromAli> getRecentProducts() {
-        LocalDateTime now = LocalDateTime.now();
+    public List<ProductEntityFromAli> getRecentProducts() {   LocalDateTime now = LocalDateTime.now();
         LocalDateTime tenMinutesAgo = now.minusMinutes(10);
         return aliExpressRepository.findByCreatedAtBetween(tenMinutesAgo, now);
     }

@@ -1,45 +1,47 @@
 package com.example.memorydb;
 
-import com.example.memorydb.ali.db.repository.AliExpressRepository;
 import com.global.iop.api.IopClient;
 import com.global.iop.api.IopClientImpl;
 import com.global.iop.api.IopRequest;
 import com.global.iop.api.IopResponse;
+import com.global.iop.domain.Protocol;
 import com.global.iop.util.ApiException;
 import com.global.iop.util.StringUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-//import com.squareup.okhttp.*;
 import com.google.gson.JsonParser;
-import net.minidev.json.JSONObject;
-import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
 import okhttp3.*;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCrypt;
-import com.global.iop.domain.Protocol;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 @SpringBootTest
 class MemorydbApplicationTests {
@@ -69,7 +71,9 @@ class MemorydbApplicationTests {
 		originProduct.addProperty("saleType", "NEW");
 		originProduct.addProperty("leafCategoryId", "50002936");
 		originProduct.addProperty("name", "아이패드 프로 12.9 매트 필름");
-		originProduct.addProperty("detailContent", "아이패드 프로 12.9 매트 필름");
+		//originProduct.addProperty("detailContent", "아이패드 프로 12.9 매트 필름");
+		originProduct.addProperty("detailContent", crawling("https://ko.aliexpress.com/item/1005006109804924.html?pdp_npi=4%40dis%21KRW%21217948%2188764%21%21%21154.54%2162.94%21%4021013dad17166492828783277d13f1%2112000035790969897%21affd%21%21%21"));
+
 
 		JsonObject representativeImage = new JsonObject();
 		String NaverURL = register("https://ae01.alicdn.com/kf/S2287e804968345e598a1841b7925e88ck.jpg");
@@ -337,6 +341,62 @@ class MemorydbApplicationTests {
 		Response response = client.newCall(request).execute();
 		String responseBody = response.body().string();
 		System.out.println(responseBody);
+	}
+
+
+	@Test
+	void crawl() {
+		String initialUrl = "https://ko.aliexpress.com/item/1005006109804924.html?pdp_npi=4%40dis%21KRW%21217948%2188764%21%21%21154.54%2162.94%21%4021013dad17166492828783277d13f1%2112000035790969897%21affd%21%21%21";
+		String descriptionHtml = crawling(initialUrl);
+		if (descriptionHtml != null) {
+			System.out.println("HTML Content:\n" + descriptionHtml);
+		}
+	}
+
+	private String crawling(String url) {
+		try {
+			// Document 객체를 통해 URL로부터 HTML을 파싱합니다.
+			Document doc = Jsoup.connect(url).get();
+
+			// 스크립트 요소에서 텍스트 추출
+			Elements scriptElements = doc.select("script");
+			String scriptContent = "";
+			for (Element script : scriptElements) {
+				if (script.html().contains("descriptionUrl")) {
+					scriptContent = script.html();
+					break;
+				}
+			}
+
+			// 정규식을 사용하여 descriptionUrl 추출
+			Pattern pattern = Pattern.compile("descriptionUrl\":\"(.*?)\"");
+			Matcher matcher = pattern.matcher(scriptContent);
+			if (matcher.find()) {
+				String descriptionUrl = matcher.group(1);
+				System.out.println("Description URL: " + descriptionUrl);
+
+				// 추출된 descriptionUrl을 사용하여 HTML을 파싱하고 반환합니다.
+				return getHtmlContent(descriptionUrl);
+			} else {
+				System.out.println("Description URL not found.");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public String getHtmlContent(String url) throws IOException {
+		try {
+			// Document 객체를 통해 URL로부터 HTML을 파싱합니다.
+			Document doc = Jsoup.connect(url).get();
+
+			// HTML을 문자열로 반환합니다.
+			return doc.html();
+		} catch (org.jsoup.HttpStatusException e) {
+			System.out.println("HTTP error fetching URL. Status=" + e.getStatusCode() + ", URL=" + e.getUrl());
+			return null;
+		}
 	}
 
 	@Test

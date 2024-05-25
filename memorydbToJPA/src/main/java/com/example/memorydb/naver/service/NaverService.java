@@ -12,6 +12,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minidev.json.parser.ParseException;
 import okhttp3.*;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -32,6 +36,8 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class NaverService {
@@ -83,8 +89,12 @@ public class NaverService {
             }
             System.out.println("상품명: "+productTitle);
             originProduct.addProperty("name", productTitle);
-            originProduct.addProperty("detailContent", productTitle);
-
+            String DetailURL = product.getProductDetailUrl();
+            DetailURL = crawling(DetailURL);
+            if (DetailURL!=null)
+                originProduct.addProperty("detailContent", DetailURL);
+            else
+                originProduct.addProperty("detailContent", productTitle);
             JsonObject representativeImage = new JsonObject();
             String NaverURL = registerWithDelay(product.getProductMainImageUrl());
             if (NaverURL == null) continue; // Main 이미지 등록 실패 시 스킵
@@ -119,12 +129,12 @@ public class NaverService {
 
             JsonObject deliveryFee = new JsonObject();
             deliveryFee.addProperty("deliveryFeeType", "PAID");
-            deliveryFee.addProperty("baseFee", 5000);
+            deliveryFee.addProperty("baseFee", 3000);
             deliveryFee.addProperty("deliveryFeePayType", "PREPAID");
 
             JsonObject deliveryFeeByArea = new JsonObject();
             deliveryFeeByArea.addProperty("deliveryAreaType", "AREA_2");
-            deliveryFeeByArea.addProperty("area2extraFee", 15000);
+            deliveryFeeByArea.addProperty("area2extraFee", 10000);
             deliveryFee.add("deliveryFeeByArea", deliveryFeeByArea);
 
             deliveryFee.addProperty("differentialFeeByArea", "제주 및 도서산간 지역 추가 배송비 발생합니다");
@@ -147,7 +157,7 @@ public class NaverService {
 
             JsonObject originAreaInfo = new JsonObject();
             originAreaInfo.addProperty("originAreaCode", "0200037");
-            originAreaInfo.addProperty("importer", "Keib");
+            originAreaInfo.addProperty("importer", "AutoStore");
             detailAttribute.add("originAreaInfo", originAreaInfo);
 
             JsonObject optionInfo = new JsonObject();
@@ -428,5 +438,51 @@ public class NaverService {
 
         System.out.println("추출된 이미지 URL: " + uploadedImageUrl);
         return uploadedImageUrl;
+    }
+
+    private String crawling(String url) {
+        try {
+            // Document 객체를 통해 URL로부터 HTML을 파싱합니다.
+            Document doc = Jsoup.connect(url).get();
+
+            // 스크립트 요소에서 텍스트 추출
+            Elements scriptElements = doc.select("script");
+            String scriptContent = "";
+            for (Element script : scriptElements) {
+                if (script.html().contains("descriptionUrl")) {
+                    scriptContent = script.html();
+                    break;
+                }
+            }
+
+            // 정규식을 사용하여 descriptionUrl 추출
+            Pattern pattern = Pattern.compile("descriptionUrl\":\"(.*?)\"");
+            Matcher matcher = pattern.matcher(scriptContent);
+            if (matcher.find()) {
+                String descriptionUrl = matcher.group(1);
+                System.out.println("Description URL: " + descriptionUrl);
+
+                // 추출된 descriptionUrl을 사용하여 HTML을 파싱하고 반환합니다.
+                return getHtmlContent(descriptionUrl);
+            } else {
+                System.out.println("Description URL not found.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getHtmlContent(String url) throws IOException {
+        try {
+            // Document 객체를 통해 URL로부터 HTML을 파싱합니다.
+            Document doc = Jsoup.connect(url).get();
+
+            // HTML을 문자열로 반환합니다.
+            return doc.html();
+        } catch (org.jsoup.HttpStatusException e) {
+            System.out.println("HTTP error fetching URL. Status=" + e.getStatusCode() + ", URL=" + e.getUrl());
+            return null;
+        }
     }
 }

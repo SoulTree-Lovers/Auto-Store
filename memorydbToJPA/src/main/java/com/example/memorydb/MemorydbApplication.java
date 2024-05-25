@@ -32,10 +32,10 @@ public class MemorydbApplication {
 	}
 
 	@Scheduled(fixedRate = 3600000) // 60분마다 실행
-	//@Scheduled(cron = "0 0 0 1 * ?") // 매달 1일 자정에 실행
+//	@Scheduled(cron = "0 0 0 1 * ?") // 매달 1일 자정에 실행
 	public void loadData() throws Exception {
 		// 상품 DB 초기화
-		aliService.deleteAllProducts();
+		//aliService.deleteAllProducts();
 		// 등록 상품 삭제
 		naverService.deleteProduct();
 		// 네이버 DB(등록 상품 ID DB) 초기화
@@ -44,6 +44,5 @@ public class MemorydbApplication {
 		List<ProductEntityFromAli> productList = aliService.loadAllProducts();
 		// 상품 등록(호출 기준 10분 이내 생성된 데이터만 등록=>과거의 데이터 등록 X)
 		naverService.registerProduct();
-
 	}
 }
