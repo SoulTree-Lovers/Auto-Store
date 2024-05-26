@@ -11,8 +11,11 @@ server:
       max: 3000       # 최대 쓰레드 개수
       min-spare: 1000 # 최소 쓰레드 개수
 
-
 spring:
+  threads:
+    virtual:
+      enabled: true
+
   boot:
     admin:
       client:
@@ -40,6 +43,8 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: root # db 비밀번호
+
+
 
 #  datasource:
 #    driver-class-name: com.mysql.cj.jdbc.Driver
