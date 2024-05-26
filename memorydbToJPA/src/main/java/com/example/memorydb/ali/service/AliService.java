@@ -11,6 +11,7 @@ import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -197,5 +198,19 @@ public class AliService {
 
     public void saveAllProducts(List<ProductEntityFromAli> products) {
         aliExpressRepository.saveAll(products);
+    }
+
+    public long countProducts() {
+        return aliExpressRepository.count();
+    }
+
+    @Transactional
+    public void deleteOldestDateProducts() {
+        List<LocalDateTime> oldestDates = aliExpressRepository.findOldestDates();
+        if (!oldestDates.isEmpty()) {
+            LocalDateTime oldestDate = oldestDates.get(0);
+            List<ProductEntityFromAli> oldestProducts = aliExpressRepository.findByCreatedAt(oldestDate);
+            aliExpressRepository.deleteAll(oldestProducts);
+        }
     }
 }

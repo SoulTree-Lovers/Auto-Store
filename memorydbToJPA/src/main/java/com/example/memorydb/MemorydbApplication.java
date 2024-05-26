@@ -31,11 +31,22 @@ public class MemorydbApplication {
 		SpringApplication.run(MemorydbApplication.class, args);
 	}
 
-	@Scheduled(fixedRate = 3600000) // 60분마다 실행
-//	@Scheduled(cron = "0 0 0 1 * ?") // 매달 1일 자정에 실행
+	private static final int MAX_PRODUCTS = 10000; // 데이터베이스에 저장할 최대 상품 개수
+//	@Scheduled(fixedRate = 3600000) // 60분마다 실행
+	@Scheduled(cron = "0 0 0 1 * ?") // 매달 1일 자정에 실행
 	public void loadData() throws Exception {
 		// 상품 DB 초기화
 		//aliService.deleteAllProducts();
+		long productCount = aliService.countProducts();
+		if (productCount > MAX_PRODUCTS) {
+			System.out.println("DataBase Initialization Occur");
+			// 가장 오래된 날짜의 데이터 삭제
+			aliService.deleteOldestDateProducts();
+		}
+		else {
+			System.out.println("Can get more Data");
+		}
+
 		// 등록 상품 삭제
 		naverService.deleteProduct();
 		// 네이버 DB(등록 상품 ID DB) 초기화
@@ -45,4 +56,6 @@ public class MemorydbApplication {
 		// 상품 등록(호출 기준 10분 이내 생성된 데이터만 등록=>과거의 데이터 등록 X)
 		naverService.registerProduct();
 	}
+
+
 }
