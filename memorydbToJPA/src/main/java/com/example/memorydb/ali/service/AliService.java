@@ -29,10 +29,10 @@ public class AliService {
     private final AliExpressRepository aliExpressRepository;
     String url = "https://api-sg.aliexpress.com/";
     String SIGN_METHOD = "sha256";
-    String appkey = "505450";
-    String appSecret = "wvnyRtRuvXPKThi4bsX5SzzXwxK2sAOs";
-    String CODE = "3_505450_Z5v32pqtE4jTtfDBxeZq0nAn6351";
-    String TOKEN = "50000200c10umQ9mwoQecd18ee0528IzClSfuvHADAw8L0uDnfPkXFtWCHwvNBNLGAZs";
+    String appkey = "APPKEY";
+    String appSecret = "APPSECRET";
+    String CODE = "CODE";
+    String TOKEN = "TOKEN";
     String appSignature="keib";
     String trackingId="keib";
     private IopClient iopClient;
