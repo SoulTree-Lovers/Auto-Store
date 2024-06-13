@@ -33,6 +33,7 @@ dependencies {
     implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.2.0-M2'
 
     implementation group: 'com.zaxxer', name: 'HikariCP', version: '5.1.0'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 //    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.3'
