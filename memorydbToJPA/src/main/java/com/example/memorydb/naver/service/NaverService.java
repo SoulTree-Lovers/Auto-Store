@@ -54,8 +54,8 @@ public class NaverService {
         return naverRepository.save(naverEntity);
     }
 
-    private String clientId = "7IhZZgD9MgJg9wvwvHTpIc";
-    private String clientSecret = "$2a$04$QD6jfkmbqnEc/kQrayyU1.";
+    private String clientId = "CLIENTID";
+    private String clientSecret = "CLIENTSECRET";
 
     @Autowired
     public NaverService(AliService aliService) {
